@@ -1,16 +1,25 @@
 import style from "./page.module.css";
 import { notFound } from "next/navigation";
 
+// export const dynamicParams = false;
+// 특정 페이지의 유형을 강제로 Static, Dynamic 페이지로 설정
+// 1. auto : 기본값, 아무것도 강제하지 않음
+// 2. force-dynamic : 항상 Dynamic 페이지로 강제
+// 3. force-static : 항상 Static 페이지로 강제
+// 4. error : 페이지를 강제로 Static 페이지 설정 (설정하면 안되는 이유 -> 빌드 오류)
+
 export function generateStaticParams() {
   return [{ id: "1" }, { id: "2" }, { id: "3" }];
 }
 
+
 export default async function Page({
   params,
 }: {
-  params: { id: string | string[] };
+  params: Promise<{ id: string }>;
 }) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${params.id}`)
+  const { id } = await params;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${id}`)
   if (!response.ok) {
     if (response.status === 404) {
       notFound();
